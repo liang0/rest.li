@@ -37,6 +37,7 @@ import com.linkedin.r2.message.Request;
 import com.linkedin.r2.message.RequestContext;
 import com.linkedin.r2.transport.common.TransportClientFactory;
 import com.linkedin.r2.transport.common.bridge.client.TransportClient;
+import com.linkedin.test.util.retry.ThreeRetries;
 import java.io.File;
 import java.io.IOException;
 import java.net.URISyntaxException;
@@ -99,7 +100,7 @@ public class WarmUpLoadBalancerTest
     Assert.assertEquals(VALID_FILES.size(), requestCount.get());
   }
 
-  @Test(timeOut = 10000)
+  @Test(timeOut = 10000, retryAnalyzer = ThreeRetries.class)
   public void testDeletingFilesAfterShutdown() throws InterruptedException, ExecutionException, TimeoutException
   {
     createDefaultServicesIniFiles();

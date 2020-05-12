@@ -16,6 +16,7 @@
 
 package com.linkedin.r2.transport.http.client;
 
+import com.linkedin.test.util.retry.ThreeRetries;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -100,7 +101,7 @@ public class TestChannelPoolManagerFactorySharingConnection
    * End to end test. Testing all the client combinations (http/https stream/rest sharing/not sharing) and check they
    * are NOT using the same channelPoolManager
    */
-  @Test(dataProvider = "configsOpenedConnections")
+  @Test(dataProvider = "configsOpenedConnections", retryAnalyzer = ThreeRetries.class)
   public void testSuccessfulRequestds(boolean restOverStream, String protocolVersion, boolean shareConnection) throws Exception
   {
     makeRequestsWithClients(shareConnection, (clients, clientFactory) ->
