@@ -17,8 +17,8 @@
 package com.linkedin.data.codec.entitystream;
 
 import com.fasterxml.jackson.core.json.async.NonBlockingJsonParser;
-import com.linkedin.data.Data;
 import com.linkedin.data.DataComplex;
+import com.linkedin.data.DataParser;
 import java.util.EnumSet;
 
 
@@ -39,7 +39,7 @@ public class JacksonJsonDataDecoder<T extends DataComplex> extends AbstractJacks
     super(JacksonStreamDataCodec.JSON_FACTORY, expectedFirstToken);
   }
 
-  protected JacksonJsonDataDecoder(EnumSet<Data.Token> expectedFirstToken)
+  protected JacksonJsonDataDecoder(EnumSet<DataParser.Token> expectedFirstToken)
   {
     super(JacksonStreamDataCodec.JSON_FACTORY, expectedFirstToken);
   }

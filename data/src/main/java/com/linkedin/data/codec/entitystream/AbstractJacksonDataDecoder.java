@@ -22,10 +22,11 @@ import com.fasterxml.jackson.core.JsonToken;
 import com.fasterxml.jackson.core.async.ByteArrayFeeder;
 import com.linkedin.data.Data;
 import com.linkedin.data.DataComplex;
+import com.linkedin.data.DataParser;
 import java.io.IOException;
 import java.util.EnumSet;
 
-import static com.linkedin.data.Data.Token.*;
+import static com.linkedin.data.DataParser.Token.*;
 
 
 /**
@@ -40,7 +41,7 @@ class AbstractJacksonDataDecoder<T extends DataComplex> extends AbstractDataDeco
 {
   /**
    * Internal tokens. Each token is presented by a bit in a byte.
-   * Deprecated, use {@link com.linkedin.data.Data.Token}
+   * Deprecated, use {@link com.linkedin.data.DataParser.Token}
    */
   @Deprecated
   enum Token
@@ -70,12 +71,12 @@ class AbstractJacksonDataDecoder<T extends DataComplex> extends AbstractDataDeco
   {
     super();
     _jsonFactory = jsonFactory;
-    EnumSet<Data.Token> expectedDataToken = NONE;
+    EnumSet<DataParser.Token> expectedDataToken = NONE;
     if ((expectedFirstToken & Token.START_OBJECT.bitPattern) != 0) {
-      expectedDataToken.add(Data.Token.START_OBJECT);
+      expectedDataToken.add(DataParser.Token.START_OBJECT);
     }
     if ((expectedFirstToken & Token.START_ARRAY.bitPattern) != 0) {
-      expectedDataToken.add(Data.Token.START_ARRAY);
+      expectedDataToken.add(DataParser.Token.START_ARRAY);
     }
     _expectedTokens = expectedDataToken;
   }
@@ -85,18 +86,18 @@ class AbstractJacksonDataDecoder<T extends DataComplex> extends AbstractDataDeco
     this(jsonFactory, START_TOKENS);
   }
 
-  protected AbstractJacksonDataDecoder(JsonFactory jsonFactory, EnumSet<Data.Token> expectedFirstToken)
+  protected AbstractJacksonDataDecoder(JsonFactory jsonFactory, EnumSet<DataParser.Token> expectedFirstToken)
   {
     super(expectedFirstToken);
     _jsonFactory = jsonFactory;
   }
 
   @Override
-  protected Data.DataParser createDataParser() throws IOException {
+  protected DataParser createDataParser() throws IOException {
     return new JacksonStreamDataParser(_jsonFactory);
   }
 
-  class JacksonStreamDataParser implements Data.DataParser
+  class JacksonStreamDataParser implements DataParser
   {
     private JsonParser _jsonParser;
     private ByteArrayFeeder _byteArrayFeeder;
@@ -128,7 +129,7 @@ class AbstractJacksonDataDecoder<T extends DataComplex> extends AbstractDataDeco
     }
 
     @Override
-    public Data.Token nextToken() throws IOException
+    public DataParser.Token nextToken() throws IOException
     {
       _previousTokenReturned = _jsonParser.nextToken();
       if (_previousTokenReturned == null)

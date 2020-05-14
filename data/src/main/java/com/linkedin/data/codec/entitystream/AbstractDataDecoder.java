@@ -1,5 +1,5 @@
 /*
-   Copyright (c) 2018 LinkedIn Corp.
+   Copyright (c) 2020 LinkedIn Corp.
 
    Licensed under the Apache License, Version 2.0 (the "License");
    you may not use this file except in compliance with the License.
@@ -22,6 +22,7 @@ import com.linkedin.data.DataComplex;
 import com.linkedin.data.DataList;
 import com.linkedin.data.DataMap;
 import com.linkedin.data.DataMapBuilder;
+import com.linkedin.data.DataParser;
 import com.linkedin.data.collections.CheckedUtil;
 import com.linkedin.entitystream.ReadHandle;
 import java.io.IOException;
@@ -31,12 +32,12 @@ import java.util.EnumSet;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionStage;
 
-import static com.linkedin.data.Data.Token.*;
+import static com.linkedin.data.DataParser.Token.*;
 
 /**
  * A decoder for a {@link DataComplex} object implemented as a
  * {@link com.linkedin.entitystream.Reader} reading from an {@link com.linkedin.entitystream.EntityStream} of
- * ByteString. The implementation is backed by a non blocking {@link com.linkedin.data.Data.DataParser}
+ * ByteString. The implementation is backed by a non blocking {@link com.linkedin.data.DataParser}
  * because the raw bytes are pushed to the decoder, it keeps the partially built data structure in a stack.
  * It is not thread safe. Caller must ensure thread safety.
  *
@@ -44,17 +45,18 @@ import static com.linkedin.data.Data.Token.*;
  */
 abstract class AbstractDataDecoder<T extends DataComplex> implements DataDecoder<T>
 {
-  private static final EnumSet<Data.Token> SIMPLE_VALUE =
+  private static final EnumSet<DataParser.Token> SIMPLE_VALUE =
       EnumSet.of(STRING, INTEGER, LONG, FLOAT, DOUBLE, BOOL_TRUE, BOOL_FALSE, NULL);
-  private static final EnumSet<Data.Token> FIELD_NAME = EnumSet.of(STRING);
-  private static final EnumSet<Data.Token> VALUE = EnumSet.of(START_OBJECT, START_ARRAY);
-  private static final EnumSet<Data.Token> NEXT_OBJECT_FIELD = EnumSet.of(END_OBJECT);
-  private static final EnumSet<Data.Token> NEXT_ARRAY_ITEM = EnumSet.of(END_ARRAY);
+  private static final EnumSet<DataParser.Token> FIELD_NAME = EnumSet.of(STRING);
+  private static final EnumSet<DataParser.Token> VALUE = EnumSet.of(START_OBJECT, START_ARRAY);
+  private static final EnumSet<DataParser.Token> NEXT_OBJECT_FIELD = EnumSet.of(END_OBJECT);
+  private static final EnumSet<DataParser.Token> NEXT_ARRAY_ITEM = EnumSet.of(END_ARRAY);
 
-  protected static final EnumSet<Data.Token> NONE = EnumSet.noneOf(Data.Token.class);
-  protected static final EnumSet<Data.Token> START_TOKENS = EnumSet.of(Data.Token.START_OBJECT, Data.Token.START_ARRAY);
-  protected static final EnumSet<Data.Token> START_ARRAY_TOKEN = EnumSet.of(Data.Token.START_ARRAY);
-  protected static final EnumSet<Data.Token> START_OBJECT_TOKEN = EnumSet.of(Data.Token.START_OBJECT);
+  protected static final EnumSet<DataParser.Token> NONE = EnumSet.noneOf(DataParser.Token.class);
+  protected static final EnumSet<DataParser.Token> START_TOKENS =
+      EnumSet.of(DataParser.Token.START_OBJECT, DataParser.Token.START_ARRAY);
+  protected static final EnumSet<DataParser.Token> START_ARRAY_TOKEN = EnumSet.of(DataParser.Token.START_ARRAY);
+  protected static final EnumSet<DataParser.Token> START_OBJECT_TOKEN = EnumSet.of(DataParser.Token.START_OBJECT);
 
   static
   {
@@ -66,7 +68,7 @@ abstract class AbstractDataDecoder<T extends DataComplex> implements DataDecoder
   private CompletableFuture<T> _completable;
   private T _result;
   private ReadHandle _readHandle;
-  private Data.DataParser _parser;
+  private DataParser _parser;
 
   private Deque<DataComplex> _stack;
   private Deque<String> _currFieldStack;
@@ -76,9 +78,9 @@ abstract class AbstractDataDecoder<T extends DataComplex> implements DataDecoder
   private ByteString _currentChunk;
   private int _currentChunkIndex = -1;
 
-  protected EnumSet<Data.Token> _expectedTokens;
+  protected EnumSet<DataParser.Token> _expectedTokens;
 
-  protected AbstractDataDecoder(EnumSet<Data.Token> expectedTokens)
+  protected AbstractDataDecoder(EnumSet<DataParser.Token> expectedTokens)
   {
     _completable = new CompletableFuture<>();
     _result = null;
@@ -114,7 +116,7 @@ abstract class AbstractDataDecoder<T extends DataComplex> implements DataDecoder
    * Interface to create non blocking data object parser that process different kind of event/read operations.
    * Method can throw IOException
    */
-  protected abstract Data.DataParser createDataParser() throws IOException;
+  protected abstract DataParser createDataParser() throws IOException;
 
   @Override
   public void onDataAvailable(ByteString data)
@@ -154,7 +156,7 @@ abstract class AbstractDataDecoder<T extends DataComplex> implements DataDecoder
   {
     try
     {
-      Data.Token token;
+      DataParser.Token token;
       while ((token = _parser.nextToken()) != null)
       {
         switch (token)
@@ -229,7 +231,7 @@ abstract class AbstractDataDecoder<T extends DataComplex> implements DataDecoder
     }
   }
 
-  protected final void validate(Data.Token token)
+  protected final void validate(DataParser.Token token)
   {
     if (!_expectedTokens.contains(token))
     {
