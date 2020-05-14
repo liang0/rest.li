@@ -105,9 +105,10 @@ record D2RelativeStrategyProperties {
   slowStartThreshold: optional double
 
   /**
-   * Regular expression used to match a request status code and indicate a server-side error.
+   * A request status code that falls within the provided ranges will be considered as a server-side error.
    */
-  errorStatusRegex: optional string
+  errorStatusFilter: optional array[HttpStatusCodeRange]
+
 
   /**
    * Emitting interval (in milliseconds) for D2Events.

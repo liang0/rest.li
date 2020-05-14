@@ -14,7 +14,7 @@ record D2RingProperties {
    * What hashing method used to hash incoming request. Used to determine which node should serve the request. Choices are Random, UriRegex
    */
   hashMethod: optional enum HashMethod {
-    
+
     /**
      * Extract a key from the URI and use it to hash the request.
      */
