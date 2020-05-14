@@ -59,6 +59,7 @@ record D2RelativeStrategyProperties {
    */
   updateIntervalMs: optional long
 
+
   /**
    * The latency metric type used to calculate the health score.
    */
@@ -111,7 +112,16 @@ record D2RelativeStrategyProperties {
   /**
    * Emitting interval (in milliseconds) for D2Events.
    */
-  emittingIntervalMs: optional int
+  emittingIntervalMs: optional long
+
+  /**
+   * When enabled, fully degraded hosts will "recover" health despite not taking any traffic.
+   * The health recovery will model that of slow start. Health score will be doubled as long
+   * as the number of requests toward the entire cluster exceed the minimum call count (minCallCount).
+   * The idea is to prevent unhealthy hosts from never receiving traffic and being able to
+   * naturally recover due to their health score and overall QPS to the cluster being too low.
+   */
+  enableFastRecovery: optional boolean
 
   /**
    * Quarantine properties.
