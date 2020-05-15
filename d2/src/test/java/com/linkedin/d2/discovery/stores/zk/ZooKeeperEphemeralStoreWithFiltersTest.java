@@ -42,7 +42,6 @@ import org.testng.Assert;
 import org.testng.annotations.AfterSuite;
 import org.testng.annotations.BeforeSuite;
 import org.testng.annotations.DataProvider;
-import org.testng.annotations.Ignore;
 import org.testng.annotations.Test;
 
 /**
@@ -57,7 +56,7 @@ public class ZooKeeperEphemeralStoreWithFiltersTest
   private int _port;
   private ExecutorService _executor = Executors.newSingleThreadExecutor();
 
-  @Test(dataProvider = "dataD2ClusterWithNumberOfChildren", retryAnalyzer = ThreeRetries.class)
+  @Test(dataProvider = "dataD2ClusterWithNumberOfChildren", groups = { "ci-flaky" })
   public void testPutWithoutPrefixAndFilter(String d2ClusterName, int numberOfChildren)
     throws IOException, InterruptedException, ExecutionException, PropertyStoreException
   {

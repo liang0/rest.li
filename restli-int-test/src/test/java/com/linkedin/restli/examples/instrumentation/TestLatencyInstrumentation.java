@@ -98,7 +98,6 @@ public class TestLatencyInstrumentation extends RestLiIntegrationTest
   private static final Set<TimingKey> TIMING_KEYS_MISSING_ON_PROTOCOL_2_0_0 =
       Collections.singleton(FrameworkTimingKeys.SERVER_REQUEST_RESTLI_URI_PARSE_1.key());
 
-  private static final int MAX_RETRIES = 2;
   private static final double NANOS_TO_MILLIS = .000001;
 
   private Map<TimingKey, TimingContextUtil.TimingContext> _resultMap;
